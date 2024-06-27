@@ -1,4 +1,4 @@
-all: conan cmake build
+all: conan cmake build test
 
 conan:
 	conan install . --build=missing
@@ -9,4 +9,7 @@ cmake:
 build:
 	cmake --build build/Release
 
-.PHONY: conan cmake build
+test:
+	bin/01_sqrt
+
+.PHONY: conan cmake build test
