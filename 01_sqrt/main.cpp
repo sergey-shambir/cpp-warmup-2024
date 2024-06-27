@@ -3,6 +3,8 @@
 #include <cmath>
 #include <cstdio>
 
+#include <catch2/catch_test_macros.hpp>
+
 double Sqrt(double x)
 {
     double result = 1.0;
