@@ -9,7 +9,8 @@ cmake:
 build:
 	cmake --build build/Release
 
-test:
+test: build
 	bin/01_sqrt
+	bin/02_eratosthenes
 
 .PHONY: conan cmake build test
