@@ -19,3 +19,6 @@ target_link_libraries(01_sqrt PRIVATE Catch2::Catch2WithMain)
 
 add_executable(02_eratosthenes 02_eratosthenes/main.cpp)
 target_link_libraries(02_eratosthenes PRIVATE Catch2::Catch2WithMain)
+
+add_executable(03_hash_table 03_hash_table/hash_table.cpp 03_hash_table/hash_table_test.cpp)
+target_link_libraries(03_hash_table PRIVATE Catch2::Catch2WithMain)

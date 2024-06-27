@@ -12,5 +12,6 @@ build:
 test: build
 	bin/01_sqrt
 	bin/02_eratosthenes
+	bin/03_hash_table
 
 .PHONY: conan cmake build test
