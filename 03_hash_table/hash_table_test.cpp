@@ -69,3 +69,24 @@ TEST_CASE("StringHashTable adds 9 strings")
     REQUIRE(table.Get("tomato") == "vegetable");
     REQUIRE(table.Get("horse") == std::nullopt);
 }
+
+TEST_CASE("StringHashTable adds and deletes strings")
+{
+    StringHashTable table;
+
+    table.Add("banana", "fruit");
+    table.Add("apple", "fruit");
+    table.Add("potato", "vegetable");
+    table.Add("dog", "animal");
+    table.Delete("banana");
+    table.Delete("dog");
+
+    REQUIRE(table.Size() == 4);
+    REQUIRE(table.Capacity() == 8);
+    REQUIRE(table.Get("banana") == std::nullopt);
+    REQUIRE(table.Get("apple") == "fruit");
+    REQUIRE(table.Get("tomato") == std::nullopt);
+    REQUIRE(table.Get("potato") == "vegetable");
+    REQUIRE(table.Get("dog") == std::nullopt);
+    REQUIRE(table.Get("cat") == std::nullopt);
+}

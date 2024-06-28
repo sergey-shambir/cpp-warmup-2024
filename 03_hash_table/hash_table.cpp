@@ -50,7 +50,7 @@ StringHashTable::StringHashTable()
 
 std::size_t StringHashTable::Size() const
 {
-    return usedSize;
+    return usedCount;
 }
 
 std::size_t StringHashTable::Capacity() const
@@ -60,15 +60,39 @@ std::size_t StringHashTable::Capacity() const
 
 void StringHashTable::Add(std::string &&key, std::string &&value)
 {
-    if (2 * usedSize >= data.size())
+    if (2 * usedCount >= data.size())
     {
         Reserve(2 * data.size());
     }
 
     if (AddImpl(data, std::forward<std::string>(key), std::forward<std::string>(value)))
     {
-        ++usedSize;
+        ++usedCount;
     }
+}
+
+void StringHashTable::Delete(const std::string &key)
+{
+    const std::size_t capacity = data.size();
+    const std::size_t startPosition = HashKey(key) % capacity;
+
+    std::size_t position = startPosition;
+    do
+    {
+        Item &item = data[position];
+        if (!item.searchable)
+        {
+            return; // Not found
+        }
+        if (item.used && item.key == key)
+        {
+            item.used = false;
+            item.key = std::string();
+            item.value = std::string();
+            return;
+        }
+        position = (position + 1) % capacity;
+    } while (position != startPosition);
 }
 
 std::optional<std::string> StringHashTable::Get(const std::string &key) const
@@ -97,7 +121,7 @@ std::optional<std::string> StringHashTable::Get(const std::string &key) const
 bool StringHashTable::AddImpl(std::vector<Item> &destination, std::string &&key, std::string &&value)
 {
     const std::size_t capacity = destination.size();
-    std::size_t startPosition = HashKey(key) % capacity;
+    const std::size_t startPosition = HashKey(key) % capacity;
 
     std::size_t position = startPosition;
     do

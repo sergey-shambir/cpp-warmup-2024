@@ -23,6 +23,8 @@ public:
 
     void Add(std::string &&key, std::string &&value);
 
+    void Delete(const std::string &key);
+
     std::optional<std::string> Get(const std::string &key) const;
 
 private:
@@ -38,6 +40,6 @@ private:
 
     void Reserve(size_t capacity);
 
-    size_t usedSize = 0;
+    size_t usedCount = 0;
     std::vector<Item> data;
 };
