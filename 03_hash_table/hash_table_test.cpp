@@ -22,9 +22,10 @@ TEST_CASE("Empty StringHashTable has capacity 8 and no values")
     REQUIRE(table.Get("banana") == std::nullopt);
 }
 
-TEST_CASE("StringHashTable adds 4 strings")
+TEST_CASE("StringHashTable adds 9 strings")
 {
     StringHashTable table;
+
     table.Add("banana", "fruit");
     table.Add("apple", "fruit");
     table.Add("potato", "vegetable");
@@ -32,11 +33,39 @@ TEST_CASE("StringHashTable adds 4 strings")
 
     REQUIRE(table.Size() == 4);
     REQUIRE(table.Capacity() == 8);
-
     REQUIRE(table.Get("banana") == "fruit");
     REQUIRE(table.Get("apple") == "fruit");
     REQUIRE(table.Get("tomato") == std::nullopt);
     REQUIRE(table.Get("potato") == "vegetable");
     REQUIRE(table.Get("dog") == "animal");
     REQUIRE(table.Get("cat") == std::nullopt);
+
+    table.Add("cat", "animal");
+    table.Add("turtle", "animal");
+    table.Add("snail", "animal");
+    table.Add("hamster", "animal");
+
+    REQUIRE(table.Size() == 8);
+    REQUIRE(table.Capacity() == 16); // Rehash occured.
+    // Preserved old data after rehash
+    REQUIRE(table.Get("apple") == "fruit");
+    REQUIRE(table.Get("tomato") == std::nullopt);
+    REQUIRE(table.Get("potato") == "vegetable");
+    // Added new data
+    REQUIRE(table.Get("cat") == "animal");
+    REQUIRE(table.Get("turtle") == "animal");
+    REQUIRE(table.Get("snail") == "animal");
+    REQUIRE(table.Get("hamster") == "animal");
+
+    table.Add("tomato", "vegetable");
+
+    REQUIRE(table.Size() == 9);
+    REQUIRE(table.Capacity() == 32); // Rehash occured.
+    // Preserved old data after rehash
+    REQUIRE(table.Get("apple") == "fruit");
+    REQUIRE(table.Get("cat") == "animal");
+    REQUIRE(table.Get("snail") == "animal");
+    // Added new data
+    REQUIRE(table.Get("tomato") == "vegetable");
+    REQUIRE(table.Get("horse") == std::nullopt);
 }

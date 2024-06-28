@@ -1,5 +1,6 @@
 #include "hash_table.hpp"
 #include <stdexcept>
+#include <cassert>
 
 constexpr std::size_t HASH_FACTOR = 127247;
 constexpr std::size_t HASH_ADDENUM = 843253;
@@ -64,30 +65,10 @@ void StringHashTable::Add(std::string &&key, std::string &&value)
         Reserve(2 * data.size());
     }
 
-    const std::size_t capacity = data.size();
-    std::size_t startPosition = HashKey(key) % capacity;
-
-    std::size_t position = startPosition;
-    do
+    if (AddImpl(data, std::forward<std::string>(key), std::forward<std::string>(value)))
     {
-        auto& keyValue = data[position];
-        if (keyValue.has_value())
-        {
-            if (keyValue->first == key)
-            {
-                return; // Already added
-            }
-            position = (position + 1) % capacity;
-        }
-        else
-        {
-            keyValue.emplace(key, value);
-            ++size;
-            return;
-        }
-    } while (position != startPosition);
-
-    throw std::logic_error("failed to insert value on position " + std::to_string(position));
+        ++size;
+    }
 }
 
 std::optional<std::string> StringHashTable::Get(const std::string &key) const
@@ -113,8 +94,44 @@ std::optional<std::string> StringHashTable::Get(const std::string &key) const
     return std::nullopt;
 }
 
+bool StringHashTable::AddImpl(std::vector<std::optional<KeyValue>> &destination, std::string &&key, std::string &&value)
+{
+    const std::size_t capacity = destination.size();
+    std::size_t startPosition = HashKey(key) % capacity;
+
+    std::size_t position = startPosition;
+    do
+    {
+        std::optional<KeyValue> &keyValue = destination[position];
+        if (keyValue.has_value())
+        {
+            if (keyValue->first == key)
+            {
+                return false; // Already added
+            }
+            position = (position + 1) % capacity;
+        }
+        else
+        {
+            keyValue.emplace(std::forward<std::string>(key), std::forward<std::string>(value));
+            return true;
+        }
+    } while (position != startPosition);
+
+    throw std::logic_error("failed to insert value on position " + std::to_string(position));
+}
+
 void StringHashTable::Reserve(size_t capacity)
 {
-    // TODO: Implement rehash
-    throw std::logic_error("rehash not implemented yet");
+    assert(capacity > data.size());
+
+    std::vector<std::optional<KeyValue>> newData(capacity, std::nullopt);
+    for (std::optional<KeyValue> &keyValue : data)
+    {
+        if (keyValue.has_value())
+        {
+            AddImpl(newData, std::move(keyValue->first), std::move(keyValue->second));
+        }
+    }
+    data = newData;
 }

@@ -31,6 +31,8 @@ public:
     std::optional<std::string> Get(const std::string &key) const;
 
 private:
+    static bool AddImpl(std::vector<std::optional<KeyValue>> &destination, std::string &&key, std::string &&value);
+
     void Reserve(size_t capacity);
 
     size_t size = 0;
