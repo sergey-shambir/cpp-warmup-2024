@@ -6,7 +6,7 @@
     - [+] Метод Delete
 - [ ] FlatMap на основе сортированного массива
     - [+] Методы Add / Get
-    - [ ] Метод Delete
+    - [+] Метод Delete
 - [ ] B+-деревья
     - [ ] Методы Insert / GetByKey
     - [ ] Метод ListByKey

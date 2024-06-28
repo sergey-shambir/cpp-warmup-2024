@@ -26,14 +26,23 @@ public:
         data.insert(it, {std::forward<Key>(key), std::forward<Value>(value)});
     }
 
+    void Delete(const Key &key)
+    {
+        const auto it = BinarySearchGreaterOrEqual(key);
+        if (it != data.end() && it->first == key)
+        {
+            data.erase(it);
+        }
+    }
+
     std::optional<Value> Get(const Key &key) const
     {
         const auto it = BinarySearchGreaterOrEqual(key);
-        if (it == data.end() || it->first != key)
+        if (it != data.end() && it->first == key)
         {
-            return std::nullopt;
+            return it->second;
         }
-        return it->second;
+        return std::nullopt;
     }
 
 private:
@@ -57,8 +66,9 @@ private:
             {
                 right = middle;
             }
-
-        } while (left != right);
+        }
+        while (left != right)
+            ;
 
         return left;
     }
