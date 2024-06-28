@@ -1,7 +1,6 @@
 #pragma once
 
 #include <cstdint>
-#include <cstdint>
 #include <optional>
 #include <string>
 #include <utility>
@@ -14,10 +13,6 @@ std::size_t HashKey(const std::string &key);
 class StringHashTable
 {
 public:
-    using KeyValue = std::pair<std::string, std::string>;
-
-    const std::size_t KeyValueSize = sizeof(KeyValue);
-
     StringHashTable();
 
     StringHashTable(const StringHashTable &) = delete;
@@ -31,10 +26,18 @@ public:
     std::optional<std::string> Get(const std::string &key) const;
 
 private:
-    static bool AddImpl(std::vector<std::optional<KeyValue>> &destination, std::string &&key, std::string &&value);
+    struct Item
+    {
+        std::string key;
+        std::string value;
+        bool used = false; // Contains key/value pair
+        bool searchable = false; // Contains key/value pair or previously contained but removed now
+    };
+
+    static bool AddImpl(std::vector<Item> &destination, std::string &&key, std::string &&value);
 
     void Reserve(size_t capacity);
 
-    size_t size = 0;
-    std::vector<std::optional<KeyValue>> data;
+    size_t usedSize = 0;
+    std::vector<Item> data;
 };

@@ -44,13 +44,13 @@ std::size_t HashKey(const std::string &key)
 }
 
 StringHashTable::StringHashTable()
-    : data(INITIAL_HASH_TABLE_CAPACITY, std::nullopt)
+    : data(INITIAL_HASH_TABLE_CAPACITY, Item{})
 {
 }
 
 std::size_t StringHashTable::Size() const
 {
-    return size;
+    return usedSize;
 }
 
 std::size_t StringHashTable::Capacity() const
@@ -60,14 +60,14 @@ std::size_t StringHashTable::Capacity() const
 
 void StringHashTable::Add(std::string &&key, std::string &&value)
 {
-    if (2 * size >= data.size())
+    if (2 * usedSize >= data.size())
     {
         Reserve(2 * data.size());
     }
 
     if (AddImpl(data, std::forward<std::string>(key), std::forward<std::string>(value)))
     {
-        ++size;
+        ++usedSize;
     }
 }
 
@@ -76,25 +76,25 @@ std::optional<std::string> StringHashTable::Get(const std::string &key) const
     const std::size_t capacity = data.size();
     std::size_t position = HashKey(key) % capacity;
 
-    const std::optional<KeyValue> *next = data.data() + position;
-    const std::optional<KeyValue> *end = data.data() + capacity;
+    const Item *next = data.data() + position;
+    const Item *end = data.data() + capacity;
 
     for (; next < end; ++next)
     {
-        const auto &keyValue = *next;
-        if (!keyValue.has_value())
+        const auto &item = *next;
+        if (!item.searchable)
         {
             return std::nullopt;
         }
-        if (keyValue->first == key)
+        if (item.used && item.key == key)
         {
-            return keyValue->second;
+            return item.value;
         }
     }
     return std::nullopt;
 }
 
-bool StringHashTable::AddImpl(std::vector<std::optional<KeyValue>> &destination, std::string &&key, std::string &&value)
+bool StringHashTable::AddImpl(std::vector<Item> &destination, std::string &&key, std::string &&value)
 {
     const std::size_t capacity = destination.size();
     std::size_t startPosition = HashKey(key) % capacity;
@@ -102,18 +102,21 @@ bool StringHashTable::AddImpl(std::vector<std::optional<KeyValue>> &destination,
     std::size_t position = startPosition;
     do
     {
-        std::optional<KeyValue> &keyValue = destination[position];
-        if (keyValue.has_value())
+        Item &item = destination[position];
+        if (item.used)
         {
-            if (keyValue->first == key)
+            if (item.key == key)
             {
-                return false; // Already added
+                return false; // Hash already contains this key-value pair
             }
             position = (position + 1) % capacity;
         }
         else
         {
-            keyValue.emplace(std::forward<std::string>(key), std::forward<std::string>(value));
+            item.used = true;
+            item.searchable = true;
+            item.key = std::forward<std::string>(key);
+            item.value = std::forward<std::string>(value);
             return true;
         }
     } while (position != startPosition);
@@ -125,12 +128,12 @@ void StringHashTable::Reserve(size_t capacity)
 {
     assert(capacity > data.size());
 
-    std::vector<std::optional<KeyValue>> newData(capacity, std::nullopt);
-    for (std::optional<KeyValue> &keyValue : data)
+    std::vector<Item> newData(capacity, Item{});
+    for (Item &item : data)
     {
-        if (keyValue.has_value())
+        if (item.used)
         {
-            AddImpl(newData, std::move(keyValue->first), std::move(keyValue->second));
+            AddImpl(newData, std::move(item.key), std::move(item.value));
         }
     }
     data = newData;
