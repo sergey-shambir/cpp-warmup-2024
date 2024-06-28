@@ -78,15 +78,25 @@ TEST_CASE("StringHashTable adds and deletes strings")
     table.Add("apple", "fruit");
     table.Add("potato", "vegetable");
     table.Add("dog", "animal");
-    table.Delete("banana");
-    table.Delete("dog");
-
     REQUIRE(table.Size() == 4);
     REQUIRE(table.Capacity() == 8);
+
+    table.Delete("banana");
+    REQUIRE(table.Size() == 3);
+    REQUIRE(table.Capacity() == 8);
+
+    table.Delete("dog");
+    REQUIRE(table.Size() == 2);
+    REQUIRE(table.Capacity() == 8);
+
+    table.Add("dog", "animal");
+
+    REQUIRE(table.Size() == 3);
+    REQUIRE(table.Capacity() == 16);
     REQUIRE(table.Get("banana") == std::nullopt);
-    REQUIRE(table.Get("apple") == "fruit");
+    REQUIRE(*table.Get("apple") == "fruit");
     REQUIRE(table.Get("tomato") == std::nullopt);
-    REQUIRE(table.Get("potato") == "vegetable");
-    REQUIRE(table.Get("dog") == std::nullopt);
+    REQUIRE(*table.Get("potato") == "vegetable");
+    REQUIRE(table.Get("dog") == "animal");
     REQUIRE(table.Get("cat") == std::nullopt);
 }

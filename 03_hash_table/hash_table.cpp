@@ -43,122 +43,193 @@ std::size_t HashKey(const std::string &key)
     return result;
 }
 
+class StringHashTable::State
+{
+public:
+    struct Item
+    {
+        std::string key;
+        std::string value;
+        bool used = false;       // Contains key/value pair
+        bool searchable = false; // Contains key/value pair or previously contained but removed now
+
+        void Emplace(std::string &&key, std::string &&value)
+        {
+            used = true;
+            searchable = true;
+            this->key = std::forward<std::string>(key);
+            this->value = std::forward<std::string>(value);
+        }
+
+        void Delete()
+        {
+            used = false;
+            key = std::string();
+            value = std::string();
+        }
+    };
+
+    State(size_t capacity)
+        : items(capacity, Item{})
+    {
+    }
+
+    size_t UsedCount() const
+    {
+        return usedCount;
+    }
+
+    size_t Capacity() const
+    {
+        return items.size();
+    }
+
+    std::optional<std::string> Get(const std::string &key) const
+    {
+        const std::size_t capacity = items.size();
+        const std::size_t startPosition = HashKey(key) % capacity;
+
+        std::size_t position = startPosition;
+        do
+        {
+            const Item &item = items[position];
+            if (!item.searchable)
+            {
+                return std::nullopt;
+            }
+            if (item.used && item.key == key)
+            {
+                return item.value;
+            }
+            position = (position + 1) % capacity;
+        } while (position != startPosition);
+
+        return std::nullopt;
+    }
+
+    bool Add(std::string &&key, std::string &&value)
+    {
+        const std::size_t capacity = items.size();
+        const std::size_t startPosition = HashKey(key) % capacity;
+
+        std::size_t position = startPosition;
+        do
+        {
+            Item &item = items[position];
+            if (item.used)
+            {
+                if (item.key == key)
+                {
+                    return false; // Hash already contains this key-value pair
+                }
+                position = (position + 1) % capacity;
+            }
+            else
+            {
+                const bool wasSearchable = item.searchable;
+                item.Emplace(std::forward<std::string>(key), std::forward<std::string>(value));
+
+                ++usedCount;
+                if (!wasSearchable)
+                {
+                    ++searchableCount;
+                }
+
+                return true;
+            }
+        } while (position != startPosition);
+
+        throw std::logic_error("failed to insert value on position " + std::to_string(position));
+    }
+
+    void Delete(const std::string &key)
+    {
+        const std::size_t capacity = items.size();
+        const std::size_t startPosition = HashKey(key) % capacity;
+
+        std::size_t position = startPosition;
+        do
+        {
+            Item &item = items[position];
+            if (!item.searchable)
+            {
+                return; // Not found
+            }
+            if (item.used && item.key == key)
+            {
+                item.Delete();
+                --usedCount;
+                return;
+            }
+            position = (position + 1) % capacity;
+        } while (position != startPosition);
+    }
+
+    bool ShouldRehashBeforeAdd() const
+    {
+        return 2 * searchableCount >= items.size();
+    }
+
+    void MoveItemsTo(State &newState)
+    {
+        for (Item &item : items)
+        {
+            if (item.used)
+            {
+                newState.Add(std::move(item.key), std::move(item.value));
+            }
+        }
+    }
+
+private:
+    size_t usedCount = 0;
+    size_t searchableCount = 0;
+    std::vector<Item> items;
+};
+
 StringHashTable::StringHashTable()
-    : data(INITIAL_HASH_TABLE_CAPACITY, Item{})
+    : state(new State(INITIAL_HASH_TABLE_CAPACITY))
+{
+}
+
+StringHashTable::~StringHashTable()
 {
 }
 
 std::size_t StringHashTable::Size() const
 {
-    return usedCount;
+    return state->UsedCount();
 }
 
 std::size_t StringHashTable::Capacity() const
 {
-    return data.size();
+    return state->Capacity();
 }
 
 void StringHashTable::Add(std::string &&key, std::string &&value)
 {
-    if (2 * usedCount >= data.size())
+    if (state->ShouldRehashBeforeAdd())
     {
-        Reserve(2 * data.size());
+        Rehash(2 * state->Capacity());
     }
-
-    if (AddImpl(data, std::forward<std::string>(key), std::forward<std::string>(value)))
-    {
-        ++usedCount;
-    }
+    state->Add(std::forward<std::string>(key), std::forward<std::string>(value));
 }
 
 void StringHashTable::Delete(const std::string &key)
 {
-    const std::size_t capacity = data.size();
-    const std::size_t startPosition = HashKey(key) % capacity;
-
-    std::size_t position = startPosition;
-    do
-    {
-        Item &item = data[position];
-        if (!item.searchable)
-        {
-            return; // Not found
-        }
-        if (item.used && item.key == key)
-        {
-            item.used = false;
-            item.key = std::string();
-            item.value = std::string();
-            return;
-        }
-        position = (position + 1) % capacity;
-    } while (position != startPosition);
+    state->Delete(key);
 }
 
 std::optional<std::string> StringHashTable::Get(const std::string &key) const
 {
-    const std::size_t capacity = data.size();
-    std::size_t position = HashKey(key) % capacity;
-
-    const Item *next = data.data() + position;
-    const Item *end = data.data() + capacity;
-
-    for (; next < end; ++next)
-    {
-        const auto &item = *next;
-        if (!item.searchable)
-        {
-            return std::nullopt;
-        }
-        if (item.used && item.key == key)
-        {
-            return item.value;
-        }
-    }
-    return std::nullopt;
+    return state->Get(key);
 }
 
-bool StringHashTable::AddImpl(std::vector<Item> &destination, std::string &&key, std::string &&value)
+void StringHashTable::Rehash(std::size_t capacity)
 {
-    const std::size_t capacity = destination.size();
-    const std::size_t startPosition = HashKey(key) % capacity;
+    assert(capacity > state->Capacity());
 
-    std::size_t position = startPosition;
-    do
-    {
-        Item &item = destination[position];
-        if (item.used)
-        {
-            if (item.key == key)
-            {
-                return false; // Hash already contains this key-value pair
-            }
-            position = (position + 1) % capacity;
-        }
-        else
-        {
-            item.used = true;
-            item.searchable = true;
-            item.key = std::forward<std::string>(key);
-            item.value = std::forward<std::string>(value);
-            return true;
-        }
-    } while (position != startPosition);
-
-    throw std::logic_error("failed to insert value on position " + std::to_string(position));
-}
-
-void StringHashTable::Reserve(size_t capacity)
-{
-    assert(capacity > data.size());
-
-    std::vector<Item> newData(capacity, Item{});
-    for (Item &item : data)
-    {
-        if (item.used)
-        {
-            AddImpl(newData, std::move(item.key), std::move(item.value));
-        }
-    }
-    data = newData;
+    auto newState = std::make_unique<State>(capacity);
+    state->MoveItemsTo(*newState);
+    std::swap(state, newState);
 }

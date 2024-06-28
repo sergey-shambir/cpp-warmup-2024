@@ -5,6 +5,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <memory>
 
 std::size_t HashKey(std::uint32_t key);
 
@@ -14,6 +15,7 @@ class StringHashTable
 {
 public:
     StringHashTable();
+    ~StringHashTable();
 
     StringHashTable(const StringHashTable &) = delete;
 
@@ -28,18 +30,9 @@ public:
     std::optional<std::string> Get(const std::string &key) const;
 
 private:
-    struct Item
-    {
-        std::string key;
-        std::string value;
-        bool used = false; // Contains key/value pair
-        bool searchable = false; // Contains key/value pair or previously contained but removed now
-    };
+    void Rehash(std::size_t capacity);
 
-    static bool AddImpl(std::vector<Item> &destination, std::string &&key, std::string &&value);
+    class State;
 
-    void Reserve(size_t capacity);
-
-    size_t usedCount = 0;
-    std::vector<Item> data;
+    std::unique_ptr<State> state;
 };
