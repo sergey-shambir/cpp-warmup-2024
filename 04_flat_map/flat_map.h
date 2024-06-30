@@ -21,15 +21,26 @@ public:
         return data.capacity();
     }
 
-    void Add(Key &&key, Value &&value)
+    void Add(const Key &key, const Value &value)
     {
-        const auto it = BinarySearchGreaterOrEqual(key);
-        data.insert(it, {std::forward<Key>(key), std::forward<Value>(value)});
+        const auto it = std::ranges::partition_point(data, [&key] (const KeyValue &pair) {
+            return pair.first < key;
+        });
+        if (it != data.end() && it->first == key)
+        {
+            it->second = value;
+        }
+        else
+        {
+            data.insert(it, {key, value});
+        }
     }
 
     void Delete(const Key &key)
     {
-        const auto it = BinarySearchGreaterOrEqual(key);
+        const auto it = std::ranges::partition_point(data, [&key] (const KeyValue &pair) {
+            return pair.first < key;
+        });
         if (it != data.end() && it->first == key)
         {
             data.erase(it);
@@ -38,7 +49,9 @@ public:
 
     std::optional<Value> Get(const Key &key) const
     {
-        const auto it = BinarySearchGreaterOrEqual(key);
+        const auto it = std::ranges::partition_point(data, [&key] (const KeyValue &pair) {
+            return pair.first < key;
+        });
         if (it != data.end() && it->first == key)
         {
             return it->second;
@@ -49,13 +62,6 @@ public:
 private:
     using Vector = typename std::vector<KeyValue>;
     using ConstIterator = typename Vector::const_iterator;
-
-    ConstIterator BinarySearchGreaterOrEqual(const Key &key) const
-    {
-        return std::partition_point(data.begin(), data.end(), [&key] (const KeyValue &pair) {
-            return pair.first < key;
-        });
-    }
 
     Vector data;
 };

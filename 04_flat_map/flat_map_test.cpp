@@ -1,4 +1,4 @@
-#include "flat_map.hpp"
+#include "flat_map.h"
 #include <string>
 #include <catch2/catch_test_macros.hpp>
 
@@ -23,9 +23,13 @@ TEST_CASE("FlatMap<string,string> can add values")
     FlatMap<std::string,std::string> map;
 
     map.Add("banana", "fruit");
-    map.Add("apple", "fruit");
+    map.Add("apple", "unknown");
     map.Add("potato", "vegetable");
     map.Add("dog", "animal");
+
+    // Add same value again
+    map.Add("apple", "vegetable");
+    map.Add("apple", "fruit");
 
     REQUIRE(map.Size() == 4);
     REQUIRE(map.Get("banana") == "fruit");
@@ -41,7 +45,7 @@ TEST_CASE("FlatMap<string,string> can add values")
     map.Add("hamster", "animal");
 
     REQUIRE(map.Size() == 8);
-    // Preserved old data after rehash
+    // Preserved old data
     REQUIRE(map.Get("apple") == "fruit");
     REQUIRE(map.Get("tomato") == std::nullopt);
     REQUIRE(map.Get("potato") == "vegetable");
@@ -54,7 +58,7 @@ TEST_CASE("FlatMap<string,string> can add values")
     map.Add("tomato", "vegetable");
 
     REQUIRE(map.Size() == 9);
-    // Preserved old data after rehash
+    // Preserved old data
     REQUIRE(map.Get("apple") == "fruit");
     REQUIRE(map.Get("cat") == "animal");
     REQUIRE(map.Get("snail") == "animal");
