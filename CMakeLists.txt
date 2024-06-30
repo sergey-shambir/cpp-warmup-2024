@@ -26,3 +26,7 @@ target_link_libraries(03_hash_table PRIVATE Catch2::Catch2WithMain)
 file(GLOB FLAT_MAP_FILES 04_flat_map/*.cpp)
 add_executable(04_flat_map ${FLAT_MAP_FILES})
 target_link_libraries(04_flat_map PRIVATE Catch2::Catch2WithMain)
+
+file(GLOB FLAT_MAP_FILES 05_avl_tree_map/*.cpp)
+add_executable(05_avl_tree_map ${FLAT_MAP_FILES})
+target_link_libraries(05_avl_tree_map PRIVATE Catch2::Catch2WithMain)
