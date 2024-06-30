@@ -23,5 +23,6 @@ target_link_libraries(02_eratosthenes PRIVATE Catch2::Catch2WithMain)
 add_executable(03_hash_table 03_hash_table/hash_table.cpp 03_hash_table/hash_table_test.cpp)
 target_link_libraries(03_hash_table PRIVATE Catch2::Catch2WithMain)
 
-add_executable(04_flat_map 04_flat_map/flat_map_test.cpp)
+file(GLOB FLAT_MAP_FILES 04_flat_map/*.cpp)
+add_executable(04_flat_map ${FLAT_MAP_FILES})
 target_link_libraries(04_flat_map PRIVATE Catch2::Catch2WithMain)

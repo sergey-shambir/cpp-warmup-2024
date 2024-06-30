@@ -1,7 +1,6 @@
 #pragma once
 
 #include <vector>
-#include <utility>
 #include <optional>
 #include <algorithm>
 
@@ -60,8 +59,5 @@ public:
     }
 
 private:
-    using Vector = typename std::vector<KeyValue>;
-    using ConstIterator = typename Vector::const_iterator;
-
-    Vector data;
+    std::vector<KeyValue> data;
 };
