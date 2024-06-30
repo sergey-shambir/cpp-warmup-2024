@@ -3,6 +3,7 @@
 #include <vector>
 #include <utility>
 #include <optional>
+#include <algorithm>
 
 template <class Key, class Value>
 class FlatMap
@@ -51,26 +52,9 @@ private:
 
     ConstIterator BinarySearchGreaterOrEqual(const Key &key) const
     {
-        ConstIterator left = data.begin();
-        ConstIterator right = data.end();
-
-        while (left != right)
-        {
-            ConstIterator middle = left + std::distance(left, right) / 2;
-            if (middle->first < key)
-            {
-                left = middle;
-                ++left;
-            }
-            else
-            {
-                right = middle;
-            }
-        }
-        while (left != right)
-            ;
-
-        return left;
+        return std::partition_point(data.begin(), data.end(), [&key] (const KeyValue &pair) {
+            return pair.first < key;
+        });
     }
 
     Vector data;
