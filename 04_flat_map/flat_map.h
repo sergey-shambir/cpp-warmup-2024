@@ -9,6 +9,8 @@ class FlatMap
 {
 public:
     using KeyValue = std::pair<Key, Value>;
+    using KeyValueArray = std::vector<KeyValue>;
+    using ConstIterator = KeyValueArray::const_iterator;
 
     std::size_t Size() const
     {
@@ -18,6 +20,41 @@ public:
     std::size_t Capacity() const
     {
         return data.capacity();
+    }
+
+    ConstIterator begin() const
+    {
+        return data.cbegin();
+    }
+
+    ConstIterator end() const
+    {
+        return data.cend();
+    }
+
+    std::optional<Value> Get(const Key &key) const
+    {
+        const auto it = std::ranges::partition_point(data, [&key] (const KeyValue &pair) {
+            return pair.first < key;
+        });
+        if (it != data.end() && it->first == key)
+        {
+            return it->second;
+        }
+        return std::nullopt;
+    }
+
+    bool Contains(const Key &key) const
+    {
+        const auto it = std::ranges::partition_point(data, [&key] (const KeyValue &pair) {
+            return pair.first < key;
+        });
+        if (it != data.end() && it->first == key)
+        {
+            return true;
+        }
+        return false;
+
     }
 
     void Add(const Key &key, const Value &value)
@@ -46,31 +83,6 @@ public:
         }
     }
 
-    std::optional<Value> Get(const Key &key) const
-    {
-        const auto it = std::ranges::partition_point(data, [&key] (const KeyValue &pair) {
-            return pair.first < key;
-        });
-        if (it != data.end() && it->first == key)
-        {
-            return it->second;
-        }
-        return std::nullopt;
-    }
-
-    bool Contains(const Key &key) const
-    {
-        const auto it = std::ranges::partition_point(data, [&key] (const KeyValue &pair) {
-            return pair.first < key;
-        });
-        if (it != data.end() && it->first == key)
-        {
-            return true;
-        }
-        return false;
-
-    }
-
 private:
-    std::vector<KeyValue> data;
+    KeyValueArray data;
 };

@@ -1,11 +1,13 @@
+#include "../common/catch_string_makers.h"
 #include "flat_map.h"
-#include <string>
-#include <catch2/catch_test_macros.hpp>
 
+#include "../common/catch_string_makers.h"
+#include <catch2/catch_test_macros.hpp>
+#include <string>
 
 TEST_CASE("FlatMap<int,string> can add values")
 {
-    FlatMap<int,std::string> map;
+    FlatMap<int, std::string> map;
     map.Add(5, std::string("pear"));
     map.Add(10, std::string("banana"));
     map.Add(7, std::string("apple"));
@@ -17,10 +19,9 @@ TEST_CASE("FlatMap<int,string> can add values")
     REQUIRE(map.Get(11) == std::nullopt);
 }
 
-
 TEST_CASE("FlatMap<string,string> can add values")
 {
-    FlatMap<std::string,std::string> map;
+    FlatMap<std::string, std::string> map;
 
     map.Add("banana", "fruit");
     map.Add("apple", "unknown");
@@ -77,7 +78,7 @@ TEST_CASE("FlatMap<string,string> can add values")
 
 TEST_CASE("FlatMap<string,string> can add and delete")
 {
-    FlatMap<std::string,std::string> map;
+    FlatMap<std::string, std::string> map;
 
     map.Add("banana", "fruit");
     map.Add("apple", "fruit");
@@ -95,9 +96,42 @@ TEST_CASE("FlatMap<string,string> can add and delete")
 
     REQUIRE(map.Size() == 3);
     REQUIRE(map.Get("banana") == std::nullopt);
-    REQUIRE(*map.Get("apple") == "fruit");
+    REQUIRE(map.Get("apple") == "fruit");
     REQUIRE(map.Get("tomato") == std::nullopt);
-    REQUIRE(*map.Get("potato") == "vegetable");
+    REQUIRE(map.Get("potato") == "vegetable");
     REQUIRE(map.Get("dog") == "animal");
     REQUIRE(map.Get("cat") == std::nullopt);
+}
+
+TEST_CASE("FlatMap<string,string> can be iterated")
+{
+    using KeyValue = FlatMap<std::string, std::string>::KeyValue;
+
+    FlatMap<std::string, std::string> map;
+
+    map.Add("banana", "fruit");
+    map.Add("apple", "fruit");
+    map.Add("potato", "vegetable");
+    map.Add("dog", "animal");
+    map.Add("cat", "animal");
+    map.Add("snail", "animal");
+
+    auto it = map.begin();
+    REQUIRE(it != map.end());
+
+    REQUIRE(*it == KeyValue{ "apple", "fruit" });
+    ++it;
+    REQUIRE(*it == KeyValue{ "banana", "fruit" });
+    ++it;
+    REQUIRE(*it == KeyValue{ "cat", "animal" });
+    ++it;
+    REQUIRE(*it == KeyValue{ "dog", "animal" });
+    ++it;
+    REQUIRE(*it == KeyValue{ "potato", "vegetable" });
+    ++it;
+    REQUIRE(it != map.end());
+    REQUIRE(*it == KeyValue{ "snail", "animal" });
+
+    ++it;
+    REQUIRE(it == map.end());
 }
