@@ -1,6 +1,6 @@
 #include "SparseGraph.h"
-#include <stdexcept>
 #include <format>
+#include <stdexcept>
 
 SparseGraph::SparseGraph(size_t size)
     : verticies(size)
@@ -20,6 +20,11 @@ std::optional<double> SparseGraph::GetEdgeWeight(size_t fromVertex, size_t toVer
 size_t SparseGraph::Size() const
 {
     return verticies.size();
+}
+
+const SparseGraph::AdjacencyList& SparseGraph::GetAdjacencyList(size_t fromVertex) const
+{
+    return verticies.at(fromVertex);
 }
 
 void SparseGraph::Resize(size_t vertexCount)
