@@ -58,6 +58,19 @@ public:
         return std::nullopt;
     }
 
+    bool Contains(const Key &key) const
+    {
+        const auto it = std::ranges::partition_point(data, [&key] (const KeyValue &pair) {
+            return pair.first < key;
+        });
+        if (it != data.end() && it->first == key)
+        {
+            return true;
+        }
+        return false;
+
+    }
+
 private:
     std::vector<KeyValue> data;
 };

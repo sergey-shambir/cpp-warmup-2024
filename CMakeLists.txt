@@ -30,3 +30,7 @@ target_link_libraries(04_flat_map PRIVATE Catch2::Catch2WithMain)
 file(GLOB FLAT_MAP_FILES 05_avl_tree_map/*.cpp)
 add_executable(05_avl_tree_map ${FLAT_MAP_FILES})
 target_link_libraries(05_avl_tree_map PRIVATE Catch2::Catch2WithMain)
+
+file(GLOB FLAT_MAP_FILES 06_sparce_graph/*.cpp)
+add_executable(06_sparce_graph ${FLAT_MAP_FILES})
+target_link_libraries(06_sparce_graph PRIVATE Catch2::Catch2WithMain)

@@ -1,0 +1,55 @@
+#include "SparseGraph.h"
+#include <stdexcept>
+#include <format>
+
+SparseGraph::SparseGraph(size_t size)
+    : verticies(size)
+{
+}
+
+bool SparseGraph::HasEdge(size_t fromVertex, size_t toVertex) const
+{
+    return verticies.at(fromVertex).Contains(toVertex);
+}
+
+std::optional<double> SparseGraph::GetEdgeWeight(size_t fromVertex, size_t toVertex) const
+{
+    return verticies.at(fromVertex).Get(toVertex);
+}
+
+size_t SparseGraph::Size() const
+{
+    return verticies.size();
+}
+
+void SparseGraph::Resize(size_t vertexCount)
+{
+    if (verticies.size() > vertexCount)
+    {
+        throw std::invalid_argument(std::format("cannot reduce sparse graph size to {}", vertexCount));
+    }
+    verticies.resize(vertexCount);
+}
+
+void SparseGraph::AddDirectedEdge(size_t fromVertex, size_t toVertex, double weight)
+{
+    CheckVertexIndex((std::max)(fromVertex, toVertex));
+
+    verticies[fromVertex].Add(toVertex, weight);
+}
+
+void SparseGraph::AddUndirectedEdge(size_t fromVertex, size_t toVertex, double weight)
+{
+    CheckVertexIndex((std::max)(fromVertex, toVertex));
+
+    verticies[fromVertex].Add(toVertex, weight);
+    verticies[toVertex].Add(fromVertex, weight);
+}
+
+void SparseGraph::CheckVertexIndex(size_t maxVertexIndex)
+{
+    if (verticies.size() <= maxVertexIndex)
+    {
+        throw std::invalid_argument(std::format("cannot add vertex with index {}: graph contains {} verticies", maxVertexIndex, verticies.size()));
+    }
+}

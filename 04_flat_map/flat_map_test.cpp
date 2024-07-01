@@ -65,6 +65,14 @@ TEST_CASE("FlatMap<string,string> can add values")
     // Added new data
     REQUIRE(map.Get("tomato") == "vegetable");
     REQUIRE(map.Get("horse") == std::nullopt);
+
+    // Contains() results consistent with Get()
+    REQUIRE(map.Contains("apple"));
+    REQUIRE(map.Contains("cat"));
+    REQUIRE(map.Contains("snail"));
+    REQUIRE(map.Contains("tomato"));
+    REQUIRE(!map.Contains("horse"));
+    REQUIRE(!map.Contains("cow"));
 }
 
 TEST_CASE("FlatMap<string,string> can add and delete")

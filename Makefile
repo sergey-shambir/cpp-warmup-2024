@@ -15,5 +15,6 @@ test: build
 	bin/03_hash_table
 	bin/04_flat_map
 	bin/05_avl_tree_map
+	bin/06_sparce_graph
 
 .PHONY: conan cmake build test
