@@ -12,17 +12,15 @@ class SparseGraph
 public:
     using AdjacencyList = FlatMap<size_t, double>;
 
-    explicit SparseGraph(size_t size);
+    explicit SparseGraph(size_t vertexCount);
 
     bool HasEdge(size_t fromVertex, size_t toVertex) const;
 
     std::optional<double> GetEdgeWeight(size_t fromVertex, size_t toVertex) const;
 
-    size_t Size() const;
+    size_t VertexCount() const;
 
     const AdjacencyList& GetAdjacencyList(size_t fromVertex) const;
-
-    void Resize(size_t vertexCount);
 
     void AddDirectedEdge(size_t fromVertex, size_t toVertex, double weight = 1.0);
 

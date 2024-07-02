@@ -56,7 +56,7 @@ private:
 
 std::vector<double> FindDistancesFromVertex(const SparseGraph& graph, size_t fromVertex)
 {
-    DijkstraAlgorithmState state(graph.Size());
+    DijkstraAlgorithmState state(graph.VertexCount());
 
     state.UpdateDistance(fromVertex, 0.0);
 

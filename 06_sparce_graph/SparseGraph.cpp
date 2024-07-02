@@ -2,8 +2,8 @@
 #include <format>
 #include <stdexcept>
 
-SparseGraph::SparseGraph(size_t size)
-    : verticies(size)
+SparseGraph::SparseGraph(size_t vertexCount)
+    : verticies(vertexCount)
 {
 }
 
@@ -17,7 +17,7 @@ std::optional<double> SparseGraph::GetEdgeWeight(size_t fromVertex, size_t toVer
     return verticies.at(fromVertex).Get(toVertex);
 }
 
-size_t SparseGraph::Size() const
+size_t SparseGraph::VertexCount() const
 {
     return verticies.size();
 }
@@ -25,15 +25,6 @@ size_t SparseGraph::Size() const
 const SparseGraph::AdjacencyList& SparseGraph::GetAdjacencyList(size_t fromVertex) const
 {
     return verticies.at(fromVertex);
-}
-
-void SparseGraph::Resize(size_t vertexCount)
-{
-    if (verticies.size() > vertexCount)
-    {
-        throw std::invalid_argument(std::format("cannot reduce sparse graph size to {}", vertexCount));
-    }
-    verticies.resize(vertexCount);
 }
 
 void SparseGraph::AddDirectedEdge(size_t fromVertex, size_t toVertex, double weight)
