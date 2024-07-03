@@ -27,10 +27,14 @@ file(GLOB FLAT_MAP_FILES 04_flat_map/*.cpp)
 add_executable(04_flat_map ${FLAT_MAP_FILES})
 target_link_libraries(04_flat_map PRIVATE Catch2::Catch2WithMain)
 
-file(GLOB FLAT_MAP_FILES 05_avl_tree_map/*.cpp)
-add_executable(05_avl_tree_map ${FLAT_MAP_FILES})
+file(GLOB AVL_TREE_FILES 05_avl_tree_map/*.cpp)
+add_executable(05_avl_tree_map ${AVL_TREE_FILES})
 target_link_libraries(05_avl_tree_map PRIVATE Catch2::Catch2WithMain)
 
-file(GLOB FLAT_MAP_FILES 06_sparce_graph/*.cpp)
-add_executable(06_sparce_graph ${FLAT_MAP_FILES})
+file(GLOB SPARSE_GRAPH_FILES 06_sparce_graph/*.cpp)
+add_executable(06_sparce_graph ${SPARSE_GRAPH_FILES})
 target_link_libraries(06_sparce_graph PRIVATE Catch2::Catch2WithMain)
+
+file(GLOB DINNIN_PHILOSOPHERS_FILES 07_dinning_philosophers/*.cpp)
+add_executable(07_dinning_philosophers ${DINNIN_PHILOSOPHERS_FILES})
+target_link_libraries(07_dinning_philosophers PRIVATE Catch2::Catch2WithMain)
