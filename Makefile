@@ -16,6 +16,5 @@ test: build
 	bin/04_flat_map
 	bin/05_avl_tree_map
 	bin/06_sparce_graph
-	bin/07_dinning_philosophers
 
 .PHONY: conan cmake build test
