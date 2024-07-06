@@ -1,0 +1,4 @@
+
+custom_add_library_from_dir(03_hash_table)
+
+custom_add_library_test_from_dir(03_hash_table_tests 03_hash_table)

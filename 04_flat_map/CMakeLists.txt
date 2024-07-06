@@ -1,0 +1,2 @@
+
+custom_add_test_from_dir(04_flat_map_tests 04_flat_map)

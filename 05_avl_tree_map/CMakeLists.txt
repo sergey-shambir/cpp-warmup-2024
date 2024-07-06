@@ -1,0 +1,3 @@
+
+
+custom_add_test_from_dir(05_avl_tree_map_tests)
