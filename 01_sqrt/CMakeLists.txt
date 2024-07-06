@@ -1,0 +1,3 @@
+
+custom_add_library_from_dir(01_sqrt)
+custom_add_test_from_dir(01_sqrt_tests 01_sqrt)

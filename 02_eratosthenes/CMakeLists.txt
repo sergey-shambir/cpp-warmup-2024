@@ -1,0 +1,3 @@
+
+custom_add_library_from_dir(02_eratosthenes)
+custom_add_test_from_dir(02_eratosthenes_tests 02_eratosthenes)

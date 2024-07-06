@@ -1,30 +1,13 @@
+#include "sqrt.h"
+
 #include <iostream>
 #include <utility>
-#include <cmath>
 #include <cstdio>
 
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 using Catch::Matchers::WithinAbs;
-
-double Sqrt(double x)
-{
-    double result = 1.0;
-    double epsilon = 0.1e-8 * std::max(x, 1.0);
-
-    while (true)
-    {
-        double square_miss = result * result - x;
-        double correction = square_miss / (2.0 * result);
-        result -= correction;
-
-        if (std::abs(correction) < epsilon)
-        {
-            return result;
-        }
-    }
-}
 
 TEST_CASE("Sqrt calculated")
 {

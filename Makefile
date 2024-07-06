@@ -1,20 +1,26 @@
+# Use `make BUILD_TYPE=Release` to change build type
+BUILD_TYPE = Debug
+
+ifeq ($(BUILD_TYPE), Debug)
+	CONAN_RPOFILE = debug
+else ifeq ($(BUILD_TYPE), Release)
+	CONAN_RPOFILE = release
+else
+	$(error Unknown build type $(BUILD_TYPE))
+endif
+
 all: conan cmake build test
 
 conan:
-	conan install . --build=missing --profile=debug
+	conan install . --build=missing --profile=$(CONAN_RPOFILE)
 
 cmake:
-	cmake CMakeLists.txt -Bbuild/Debug -DCMAKE_TOOLCHAIN_FILE="generators/conan_toolchain.cmake" -DCMAKE_BUILD_TYPE=Debug
+	cmake CMakeLists.txt -Bbuild/$(BUILD_TYPE) -DCMAKE_TOOLCHAIN_FILE="generators/conan_toolchain.cmake" -DCMAKE_BUILD_TYPE=$(BUILD_TYPE)
 
 build:
-	cmake --build build/Debug
+	cmake --build build/$(BUILD_TYPE)
 
-test: build
-	bin/01_sqrt
-	bin/02_eratosthenes
-	bin/03_hash_table
-	bin/04_flat_map
-	bin/05_avl_tree_map
-	bin/06_sparce_graph
+test: build 
+	ctest --test-dir build/$(BUILD_TYPE)
 
 .PHONY: conan cmake build test
