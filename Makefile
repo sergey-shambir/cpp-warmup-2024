@@ -21,6 +21,6 @@ build:
 	cmake --build build/$(BUILD_TYPE)
 
 test: build 
-	ctest --test-dir build/$(BUILD_TYPE)
+	ctest --output-on-failure --test-dir build/$(BUILD_TYPE)
 
 .PHONY: conan cmake build test

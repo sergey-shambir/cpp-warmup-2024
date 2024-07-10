@@ -1,0 +1,3 @@
+
+custom_add_library_from_dir(08_deep_first_search)
+custom_add_library_test_from_dir(08_deep_first_search_tests 08_deep_first_search)
