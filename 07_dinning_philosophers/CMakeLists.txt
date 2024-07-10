@@ -1,2 +1,2 @@
 
-custom_add_executable_from_dir(05_avl_tree_map)
+custom_add_executable_from_dir(07_dinning_philosophers)
