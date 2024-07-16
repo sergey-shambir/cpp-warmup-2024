@@ -1,0 +1,5 @@
+
+add_executable(maxsubarray_tests solution.h solution.cpp solution_test.cpp)
+target_link_libraries(maxsubarray_tests PRIVATE Catch2::Catch2WithMain)
+custom_enable_sanitizers(maxsubarray_tests)
+add_test(maxsubarray_tests maxsubarray_tests)
