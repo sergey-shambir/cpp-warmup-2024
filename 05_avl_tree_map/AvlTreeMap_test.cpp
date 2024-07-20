@@ -12,6 +12,9 @@ TEST_CASE("AvlTreeMap<std::string,std::string> can insert")
     m.Insert("coconut", "fruit");
     m.Insert("potato", "vegetable");
     m.Insert("dog", "animal");
+
+    REQUIRE_THAT(m.ListKeys(), Equals(std::vector<std::string>{ "banana", "coconut", "dog", "potato" }));
+    REQUIRE_THAT(m.ListValues(), Equals(std::vector<std::string>{ "fruit", "fruit", "animal", "vegetable" }));
 }
 
 TEST_CASE("AvlTreeMap<int,std::string> can insert and remove")
