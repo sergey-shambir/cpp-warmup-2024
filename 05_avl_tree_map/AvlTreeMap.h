@@ -1,12 +1,12 @@
 #pragma once
 
+#include <cassert>
 #include <cstdint>
 #include <memory>
 #include <utility>
-#include <cassert>
 #include <vector>
 
-template <class Key, class Value>
+template<class Key, class Value>
 class AvlTreeMap
 {
     class Node;
@@ -19,26 +19,26 @@ public:
         delete root;
     }
 
-    AvlTreeMap(Node &&other) noexcept
+    AvlTreeMap(Node&& other) noexcept
     {
         std::swap(root, other.root);
     }
 
-    AvlTreeMap &operator=(Node &&other) noexcept
+    AvlTreeMap& operator=(Node&& other) noexcept
     {
         std::swap(root, other.root);
         return *this;
     }
 
-    AvlTreeMap(const Node &) = delete;
-    AvlTreeMap &operator=(const Node &) = delete;
+    AvlTreeMap(const Node&) = delete;
+    AvlTreeMap& operator=(const Node&) = delete;
 
-    void Insert(const Key &key, const Value &value)
+    void Insert(const Key& key, const Value& value)
     {
         root = InsertImpl(root, key, value);
     }
 
-    void Remove(const Key &key) noexcept
+    void Remove(const Key& key) noexcept
     {
         root = RemoveImpl(root, key);
     }
@@ -65,12 +65,13 @@ private:
     public:
         Key key;
         Value value;
-        std::uint8_t height = 0;
-        Node *left = nullptr;
-        Node *right = nullptr;
+        std::uint8_t height = 1;
+        Node* left = nullptr;
+        Node* right = nullptr;
 
-        explicit Node(const Key &key, const Value &value)
-            : key(key), value(value)
+        explicit Node(const Key& key, const Value& value)
+            : key(key)
+            , value(value)
         {
         }
 
@@ -80,25 +81,17 @@ private:
             delete right;
         }
 
-        Node(Node &&) = delete;
-        Node(const Node &) = delete;
+        Node(Node&&) = delete;
+        Node(const Node&) = delete;
 
-        Node &operator=(Node &&) = delete;
-        Node &operator=(const Node &) = delete;
+        Node& operator=(Node&&) = delete;
+        Node& operator=(const Node&) = delete;
 
-        Node *Balance() noexcept
+        Node* Balance() noexcept
         {
             UpdateHeight();
             const auto factor = GetBalanceFactor();
             if (factor == 2)
-            {
-                if (left->GetBalanceFactor() > 0)
-                {
-                    left = left->RotateLeft();
-                }
-                return RotateRight();
-            }
-            if (factor == -2)
             {
                 if (right->GetBalanceFactor() < 0)
                 {
@@ -106,15 +99,23 @@ private:
                 }
                 return RotateLeft();
             }
+            if (factor == -2)
+            {
+                if (left->GetBalanceFactor() > 0)
+                {
+                    left = left->RotateLeft();
+                }
+                return RotateRight();
+            }
             return this;
         }
 
-        Node *FindLeftmostChild() noexcept
+        Node* FindLeftmostChild() noexcept
         {
             return left ? left->FindLeftmostChild() : this;
         }
 
-        Node *RemoveLeftmostChild() noexcept
+        Node* RemoveLeftmostChild() noexcept
         {
             if (!left)
             {
@@ -125,11 +126,11 @@ private:
         }
 
     private:
-        Node *RotateRight() noexcept
+        Node* RotateRight() noexcept
         {
             assert(left != nullptr);
 
-            Node *newRoot = left;
+            Node* newRoot = left;
             left = newRoot->right;
             newRoot->right = this;
 
@@ -139,11 +140,11 @@ private:
             return newRoot;
         }
 
-        Node *RotateLeft() noexcept
+        Node* RotateLeft() noexcept
         {
             assert(right != nullptr);
 
-            Node *newRoot = right;
+            Node* newRoot = right;
             right = newRoot->left;
             newRoot->left = this;
 
@@ -155,7 +156,7 @@ private:
 
         std::int8_t GetBalanceFactor() const noexcept
         {
-            return std::int8_t(GetHeight(left)) - std::int8_t(GetHeight(right));
+            return std::int8_t(GetHeight(right)) - std::int8_t(GetHeight(left));
         }
 
         void UpdateHeight() noexcept
@@ -165,13 +166,13 @@ private:
             height = 1u + (std::max)(leftHeight, rightHeight);
         }
 
-        static std::uint8_t GetHeight(Node *node) noexcept
+        static std::uint8_t GetHeight(Node* node) noexcept
         {
             return node ? node->height : 0;
         }
     };
 
-    static Node *InsertImpl(Node *node, const Key &key, const Value &value)
+    static Node* InsertImpl(Node* node, const Key& key, const Value& value)
     {
         if (!node)
         {
@@ -192,7 +193,7 @@ private:
         return node->Balance();
     }
 
-    static Node *RemoveImpl(Node *node, const Key &key) noexcept
+    static Node* RemoveImpl(Node* node, const Key& key) noexcept
     {
         if (!node)
         {
@@ -208,8 +209,8 @@ private:
         }
         else // (key == node->key)
         {
-            Node *left = node->left;
-            Node *right = node->right;
+            Node* left = node->left;
+            Node* right = node->right;
             node->left = nullptr;
             node->right = nullptr;
             delete node;
@@ -218,7 +219,7 @@ private:
             {
                 return left;
             }
-            Node *newRoot = right->FindLeftmostChild();
+            Node* newRoot = right->FindLeftmostChild();
             newRoot->right = right->RemoveLeftmostChild();
             newRoot->left = left;
 
@@ -227,7 +228,7 @@ private:
         return node->Balance();
     }
 
-    static void ListKeysRecursive(Node *node, std::vector<Key> &keys)
+    static void ListKeysRecursive(Node* node, std::vector<Key>& keys)
     {
         if (!node)
         {
@@ -238,7 +239,7 @@ private:
         ListKeysRecursive(node->right, keys);
     }
 
-    static void ListValuesRecursive(Node *node, std::vector<Value> &values)
+    static void ListValuesRecursive(Node* node, std::vector<Value>& values)
     {
         if (!node)
         {
@@ -249,5 +250,5 @@ private:
         ListValuesRecursive(node->right, values);
     }
 
-    Node *root = nullptr;
+    Node* root = nullptr;
 };
